@@ -29,7 +29,7 @@ import java.util.List;
  * @author wangxinarhat
  *         creat at 2016/7/25
  */
-public class GankData extends BaseData {
+public class GankData {
 
     @SerializedName("category")
     public List<String> category;
