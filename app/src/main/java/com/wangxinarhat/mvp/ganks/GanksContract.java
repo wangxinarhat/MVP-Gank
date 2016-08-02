@@ -22,6 +22,7 @@ import com.wangxinarhat.mvp.base.BasePresenter;
 import com.wangxinarhat.mvp.base.BaseView;
 import com.wangxinarhat.mvp.data.Gank;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public interface GanksContract {
 
         void showGanks(List<Gank> Ganks);
 
-        void showAddGank();
+        void showReloadGank();
 
         void showGankDetailsUi(String GankId);
 
@@ -70,7 +71,7 @@ public interface GanksContract {
 
         void result(int requestCode, int resultCode);
 
-        void loadGanks(boolean forceUpdate);
+        void loadGanks(boolean forceUpdate, Date date);
 
         void addNewGank();
 

@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 
 import com.wangxinarhat.mvp.data.Gank;
 
+import java.util.Date;
 import java.util.List;
 
 import rx.Observable;
@@ -30,20 +31,31 @@ import rx.Observable;
  */
 public interface GanksDataSource {
 
-    Observable<List<Gank>> getGanks();
+    Observable<List<Gank>> getGanks(Date date);
 
     Observable<Gank> getGank(@NonNull String GankId);
 
     void saveGank(@NonNull Gank Gank);
 
+    /**
+     * read
+     * @param Gank
+     */
     void completeGank(@NonNull Gank Gank);
 
     void completeGank(@NonNull String GankId);
 
+    /**
+     * reading
+     * @param Gank
+     */
     void activateGank(@NonNull Gank Gank);
 
     void activateGank(@NonNull String GankId);
 
+    /**
+     * clear the read gank
+     */
     void clearCompletedGanks();
 
     void refreshGanks();

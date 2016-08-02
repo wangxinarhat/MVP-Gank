@@ -2,47 +2,107 @@ package com.wangxinarhat.mvp.ganks;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.wangxinarhat.mvp.R;
+import com.wangxinarhat.mvp.data.source.GanksRepository;
+import com.wangxinarhat.mvp.data.source.local.GanksLocalDataSource;
+import com.wangxinarhat.mvp.data.source.remote.GanksRemoteDataSource;
+import com.wangxinarhat.mvp.utils.ActivityUtils;
+
+import java.util.Date;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class GanksActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.contentFrame)
+    FrameLayout mContentFrame;
+    @BindView(R.id.fab)
+    FloatingActionButton mFab;
+    @BindView(R.id.nav_view)
+    NavigationView mNavView;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+
+
+    private GanksPresenter mGanksPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ganks);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        initView(savedInstanceState);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    }
+
+    private void initView(Bundle savedInstanceState) {
+        setSupportActionBar(mToolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        ab.setDisplayHomeAsUpEnabled(true);
+
+        // Set up the navigation drawer.
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+//Set up the FloatingActionButton
+
+
+        GanksFragment ganksFragment =
+                (GanksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (ganksFragment == null) {
+            // Create the fragment
+            ganksFragment = GanksFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(), ganksFragment, R.id.contentFrame);
+        }
+
+
+        // Create the presenter
+//        mGanksPresenter = new GanksPresenter(
+//                Injection.provideGanksRepository(getApplicationContext()), ganksFragment);
+        mGanksPresenter = new GanksPresenter(GanksRepository.getInstance(GanksRemoteDataSource.getInstance(new Date(System.currentTimeMillis())), GanksLocalDataSource.getInstance(this)), ganksFragment);
+        // Load previously saved state, if available.
+        if (savedInstanceState != null) {
+            GanksFilterType currentFiltering =
+                    (GanksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+            mGanksPresenter.setFiltering(currentFiltering);
+        }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(CURRENT_FILTERING_KEY, mGanksPresenter.getFiltering());
+
+        super.onSaveInstanceState(outState);
+    }
+
 
     @Override
     public void onBackPressed() {

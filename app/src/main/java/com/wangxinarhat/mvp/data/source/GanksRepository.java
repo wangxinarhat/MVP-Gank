@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import com.wangxinarhat.mvp.data.Gank;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,23 +61,23 @@ public class GanksRepository implements GanksDataSource {
     boolean mCacheIsDirty = false;
 
     // Prevent direct instantiation.
-    private GanksRepository(@NonNull GanksDataSource GanksRemoteDataSource,
-                            @NonNull GanksDataSource GanksLocalDataSource) {
-        mGanksRemoteDataSource = checkNotNull(GanksRemoteDataSource);
-        mGanksLocalDataSource = checkNotNull(GanksLocalDataSource);
+    private GanksRepository(@NonNull GanksDataSource ganksRemoteDataSource,
+                            @NonNull GanksDataSource ganksLocalDataSource) {
+        mGanksRemoteDataSource = checkNotNull(ganksRemoteDataSource);
+        mGanksLocalDataSource = checkNotNull(ganksLocalDataSource);
     }
 
     /**
      * Returns the single instance of this class, creating it if necessary.
      *
-     * @param GanksRemoteDataSource the backend data source
-     * @param GanksLocalDataSource  the device storage data source
+     * @param ganksRemoteDataSource the backend data source
+     * @param ganksLocalDataSource  the device storage data source
      * @return the {@link GanksRepository} instance
      */
-    public static GanksRepository getInstance(GanksDataSource GanksRemoteDataSource,
-                                              GanksDataSource GanksLocalDataSource) {
+    public static GanksRepository getInstance(GanksDataSource ganksRemoteDataSource,
+                                              GanksDataSource ganksLocalDataSource) {
         if (INSTANCE == null) {
-            INSTANCE = new GanksRepository(GanksRemoteDataSource, GanksLocalDataSource);
+            INSTANCE = new GanksRepository(ganksRemoteDataSource, ganksLocalDataSource);
         }
         return INSTANCE;
     }
@@ -94,7 +95,7 @@ public class GanksRepository implements GanksDataSource {
      * available first.
      */
     @Override
-    public Observable<List<Gank>> getGanks() {
+    public Observable<List<Gank>> getGanks(Date date) {
         // Respond immediately with cache if available and not dirty
         if (mCachedGanks != null && !mCacheIsDirty) {
             return Observable.from(mCachedGanks.values()).toList();
@@ -103,7 +104,7 @@ public class GanksRepository implements GanksDataSource {
         }
 
         Observable<List<Gank>> remoteGanks = mGanksRemoteDataSource
-                .getGanks()
+                .getGanks(date)
                 .flatMap(new Func1<List<Gank>, Observable<Gank>>() {
                     @Override
                     public Observable<Gank> call(List<Gank> Ganks) {
@@ -114,7 +115,7 @@ public class GanksRepository implements GanksDataSource {
                     @Override
                     public void call(Gank Gank) {
                         mGanksLocalDataSource.saveGank(Gank);
-                        mCachedGanks.put(Gank.id, Gank);
+                        mCachedGanks.put(Gank.getId(), Gank);
                     }
                 })
                 .toList()
@@ -128,7 +129,7 @@ public class GanksRepository implements GanksDataSource {
             return remoteGanks;
         } else {
             // Query the local storage if available. If not, query the network.
-            Observable<List<Gank>> localGanks = mGanksLocalDataSource.getGanks();
+            Observable<List<Gank>> localGanks = mGanksLocalDataSource.getGanks(date);
             return Observable.concat(localGanks, remoteGanks).first();
         }
     }
@@ -143,7 +144,7 @@ public class GanksRepository implements GanksDataSource {
         if (mCachedGanks == null) {
             mCachedGanks = new LinkedHashMap<>();
         }
-        mCachedGanks.put(Gank.id, Gank);
+        mCachedGanks.put(Gank.getId(), Gank);
     }
 
     @Override
@@ -152,13 +153,13 @@ public class GanksRepository implements GanksDataSource {
         mGanksRemoteDataSource.completeGank(Gank);
         mGanksLocalDataSource.completeGank(Gank);
 
-        Gank completedGank = new Gank(Gank.who, Gank.desc, Gank.id, true);
+        Gank completedGank = new Gank(Gank.getTitle(), Gank.getDescription(), Gank.getId(), true);
 
         // Do in memory cache update to keep the app UI up to date
         if (mCachedGanks == null) {
             mCachedGanks = new LinkedHashMap<>();
         }
-        mCachedGanks.put(Gank.id, completedGank);
+        mCachedGanks.put(Gank.getId(), completedGank);
     }
 
     @Override
@@ -176,13 +177,13 @@ public class GanksRepository implements GanksDataSource {
         mGanksRemoteDataSource.activateGank(Gank);
         mGanksLocalDataSource.activateGank(Gank);
 
-        Gank activeGank = new Gank(Gank.who, Gank.desc, Gank.id);
+        Gank activeGank = new Gank(Gank.getTitle(), Gank.getDescription(), Gank.getId());
 
         // Do in memory cache update to keep the app UI up to date
         if (mCachedGanks == null) {
             mCachedGanks = new LinkedHashMap<>();
         }
-        mCachedGanks.put(Gank.id, activeGank);
+        mCachedGanks.put(Gank.getId(), activeGank);
     }
 
     @Override
@@ -206,7 +207,7 @@ public class GanksRepository implements GanksDataSource {
         Iterator<Map.Entry<String, Gank>> it = mCachedGanks.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Gank> entry = it.next();
-            if (entry.getValue().isRead) {
+            if (entry.getValue().isCompleted()) {
                 it.remove();
             }
         }
@@ -244,7 +245,7 @@ public class GanksRepository implements GanksDataSource {
                     @Override
                     public void call(Gank Gank) {
                         mGanksLocalDataSource.saveGank(Gank);
-                        mCachedGanks.put(Gank.id, Gank);
+                        mCachedGanks.put(Gank.getId(), Gank);
                     }
                 });
 
