@@ -214,8 +214,6 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
         });
 
         popup.show();
-
-
     }
 
     /**
