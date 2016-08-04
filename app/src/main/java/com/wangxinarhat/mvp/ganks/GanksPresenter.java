@@ -18,6 +18,7 @@ package com.wangxinarhat.mvp.ganks;
 
 import android.support.annotation.NonNull;
 
+import com.orhanobut.logger.Logger;
 import com.wangxinarhat.mvp.data.Gank;
 import com.wangxinarhat.mvp.data.source.GanksDataSource;
 import com.wangxinarhat.mvp.data.source.GanksRepository;
@@ -26,11 +27,9 @@ import com.wangxinarhat.mvp.utils.EspressoIdlingResource;
 import java.util.Date;
 import java.util.List;
 
-import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -41,6 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * UI as required.
  */
 public class GanksPresenter implements GanksContract.Presenter {
+
+    private static final String TAG = GanksPresenter.class.getCanonicalName();
 
     private final GanksRepository mGanksRepository;
 
@@ -107,27 +108,6 @@ public class GanksPresenter implements GanksContract.Presenter {
         mSubscriptions.clear();
         Subscription subscription = mGanksRepository
                 .getGanks(date)
-                .flatMap(new Func1<List<Gank>, Observable<Gank>>() {
-                    @Override
-                    public Observable<Gank> call(List<Gank> ganks) {
-                        return Observable.from(ganks);
-                    }
-                })
-                .filter(new Func1<Gank, Boolean>() {
-                    @Override
-                    public Boolean call(Gank gank) {
-                        switch (mCurrentFiltering) {
-                            case ACTIVE_GANKS:
-                                return gank.isActive();
-                            case COMPLETED_GANKS:
-                                return gank.isCompleted();
-                            case ALL_GANKS:
-                            default:
-                                return true;
-                        }
-                    }
-                })
-                .toList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<Gank>>() {
@@ -138,6 +118,7 @@ public class GanksPresenter implements GanksContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
+                        Logger.e(TAG,e.getMessage());
                         mGanksView.showLoadingGanksError();
                     }
 

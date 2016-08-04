@@ -85,13 +85,11 @@ public class GanksRemoteDataSource implements GanksDataSource {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-       return mGankService.getGankData(year, month, day)
-               .map(GankData2Ganks.newInstance());
 
-        /*return Observable
-                .from(TASKS_SERVICE_DATA.values())
-                .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
-                .toList();*/
+        Observable<List<Gank>> observable = mGankService.getGankData(year, month, day)
+                .map(GankData2Ganks.newInstance());
+        return observable;
+
     }
 
     @Override
