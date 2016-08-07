@@ -115,28 +115,34 @@ public class GanksPresenter implements GanksContract.Presenter {
                 .getGanks(date)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Gank>>() {
-                    @Override
-                    public void onCompleted() {
-                        mGanksView.setLoadingIndicator(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.e(TAG,e.getMessage());
-                        mGanksView.showLoadingGanksError();
-                    }
-
-                    @Override
-                    public void onNext(List<Gank> ganks) {
-                        processGanks(ganks);
-                    }
-                });
+                .subscribe(getObserver());
         mSubscriptions.add(subscription);
 
 
+    }
 
-}
+    private Observer<? super List<Gank>> getObserver() {
+
+        Observer<List<Gank>> observer = new Observer<List<Gank>>() {
+            @Override
+            public void onCompleted() {
+                mGanksView.setLoadingIndicator(false);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Logger.e(TAG, e.getMessage());
+                mGanksView.showLoadingGanksError();
+            }
+
+            @Override
+            public void onNext(List<Gank> ganks) {
+                processGanks(ganks);
+            }
+        };
+
+        return observer;
+    }
 
     private void processGanks(List<Gank> ganks) {
         if (ganks.isEmpty()) {

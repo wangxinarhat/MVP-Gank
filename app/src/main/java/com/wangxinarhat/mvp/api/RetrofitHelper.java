@@ -48,9 +48,10 @@ public class RetrofitHelper {
                 .baseUrl(HOST)
                 .client(client)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
         mService = retrofit.create(GankService.class);
+
     }
 
 

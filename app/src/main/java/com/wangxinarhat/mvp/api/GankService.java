@@ -4,6 +4,7 @@ import com.wangxinarhat.mvp.data.GankData;
 import com.wangxinarhat.mvp.data.PrettyGirlData;
 import com.wangxinarhat.mvp.data.休息视频Data;
 
+import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import rx.Observable;
@@ -45,5 +46,9 @@ public interface GankService {
      */
     @GET("day/{year}/{month}/{day}")
     Observable<GankData> getGankData(@Path("year") int year, @Path("month") int month, @Path("day") int day);
+
+
+    @GET("day/{year}/{month}/{day}")
+    Call<GankData> getGankData1( @Path("year") int year, @Path("month") int month, @Path("day") int day);
 
 }

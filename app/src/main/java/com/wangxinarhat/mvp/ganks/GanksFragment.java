@@ -85,13 +85,13 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+//        mPresenter.subscribe();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
+//        mPresenter.unsubscribe();
     }
 //将presenter实例传入view中，其调用时机是presenter实现类的构造函数中。
     @Override

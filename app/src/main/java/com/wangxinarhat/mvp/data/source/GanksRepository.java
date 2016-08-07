@@ -105,21 +105,23 @@ public class GanksRepository implements GanksDataSource {
 
         Observable<List<Gank>> remoteGanks = mGanksRemoteDataSource
                 .getGanks(date)
-                .flatMap(new Func1<List<Gank>, Observable<Gank>>() {
+                .flatMap(new Func1<List<Gank>, Observable<Gank>>() {//Observable.flatMap()接收一个Observable的输出作为输入，同时输出另外一个Observable
                     @Override
-                    public Observable<Gank> call(List<Gank> Ganks) {
+                    public Observable<Gank> call(List<Gank> Ganks) {//接收一个集合作为输入，然后每次输出一个元素给subscriber
                         return Observable.from(Ganks);
                     }
                 })
-                .doOnNext(new Action1<Gank>() {
+                .doOnNext(new Action1<Gank>() {//允许我们在每次输出一个元素之前做一些额外的事情，调试、保存、缓存网络结果（直到doOnNext里的方法在新线程执行完毕，subscribe里的call才有机会在主线程执行）
                     @Override
                     public void call(Gank Gank) {
                         mGanksLocalDataSource.saveGank(Gank);
                         mCachedGanks.put(Gank.getId(), Gank);
                     }
                 })
-                .toList()
-                .doOnCompleted(new Action0() {
+                .toList()//toList操作符让Observable将多项数据组合成一个List，然后调用一次onNext方法传递整个列表。
+                         //如果原始Observable没有发射任何数据就调用了onCompleted，toList返回的Observable会在调用onCompleted之前发射一个空列表
+                         //如果原始Observable调用了onError，toList返回的Observable会立即调用它的观察者的onError方法
+                .doOnCompleted(new Action0() {//操作符注册一个动作，当它产生的Observable正常终止调用onCompleted时会被调用。
                     @Override
                     public void call() {
                         mCacheIsDirty = false;
