@@ -92,7 +92,7 @@ public class GanksRemoteDataSource implements GanksDataSource {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
 
-        Observable<List<Gank>> observable = mGankService.getGankData(year, month, day)
+        Observable<List<Gank>> observable = mGankService.getGankData(2016, 8, 5)
                 .map(new Func1<GankData, Results>() {
                     @Override
                     public Results call(GankData gankData) {

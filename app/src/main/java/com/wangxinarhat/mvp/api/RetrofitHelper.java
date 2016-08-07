@@ -44,12 +44,16 @@ public class RetrofitHelper {
     public RetrofitHelper() {
         OkHttpClient client = new OkHttpClient();
         client.connectTimeoutMillis();
+
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .client(client)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
+
+
         mService = retrofit.create(GankService.class);
 
     }

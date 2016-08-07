@@ -45,6 +45,7 @@ public class GanksPresenter implements GanksContract.Presenter {
 
     private static final String TAG = GanksPresenter.class.getCanonicalName();
 
+    private static final int DAY_OF_MILLISECOND = 24 * 60 * 60 * 1000;
     private final GanksRepository mGanksRepository;
 
     private final GanksContract.View mGanksView;
@@ -144,10 +145,17 @@ public class GanksPresenter implements GanksContract.Presenter {
         return observer;
     }
 
+    private int preDay = 1;
+
     private void processGanks(List<Gank> ganks) {
         if (ganks.isEmpty()) {
             // Show a message indicating there are no ganks for that filter type.
-            processEmptyGanks();
+            if (3 > preDay) {
+                loadGanks(false, new Date(mCurrentDate.getTime() -  DAY_OF_MILLISECOND), true);
+                preDay++;
+            } else {
+                processEmptyGanks();
+            }
         } else {
             // Show the list of ganks
             mGanksView.showGanks(ganks);
