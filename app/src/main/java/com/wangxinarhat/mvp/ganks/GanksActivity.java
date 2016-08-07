@@ -83,6 +83,7 @@ public class GanksActivity extends AppCompatActivity
                     getSupportFragmentManager(), ganksFragment, R.id.contentFrame);
         }
 
+//        创建后的fragment实例作为presenter的构造函数参数被传入，这样就可以在presenter中调用view中的方法了
 
         // Create the presenter
 //        mGanksPresenter = new GanksPresenter(

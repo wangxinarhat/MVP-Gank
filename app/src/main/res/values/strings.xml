@@ -9,8 +9,8 @@
 
 
 
-    <string name="add_gank">New TO-DO</string>
-    <string name="edit_gank">Edit TO-DO</string>
+    <string name="add_gank">New Gank</string>
+    <string name="edit_gank">Edit Gank</string>
     <string name="gank_marked_complete">Gank marked complete</string>
     <string name="gank_marked_active">Gank marked active</string>
     <string name="loading_ganks_error">Error while loading ganks</string>
@@ -18,12 +18,12 @@
     <string name="menu_filter">Filter</string>
     <string name="menu_clear">Clear completed</string>
     <string name="menu_delete_gank">Delete gank</string>
-    <string name="navigation_view_header_title">TO-DOs</string>
+    <string name="navigation_view_header_title">Ganks</string>
     <string name="title_hint">Title</string>
-    <string name="description_hint">Enter your TO-DO here.</string>
+    <string name="description_hint">Enter your Gank here.</string>
     <string name="empty_gank_message">TO DOs cannot be empty</string>
-    <string name="successfully_saved_gank_message">TO-DO saved</string>
-    <string name="list_title">TO-DO List</string>
+    <string name="successfully_saved_gank_message">Gank saved</string>
+    <string name="list_title">Gank List</string>
     <string name="statistics_title">Statistics</string>
     <string name="statistics_no_ganks">You have no ganks.</string>
     <string name="statistics_active_ganks">Active ganks:</string>
@@ -44,12 +44,12 @@
     <string name="nav_all">All</string>
     <string name="nav_active">Active</string>
     <string name="nav_completed">Completed</string>
-    <string name="label_all">All TO-DOs</string>
-    <string name="label_active">Active TO-DOs</string>
-    <string name="label_completed">Completed TO-DOs</string>
+    <string name="label_all">All Ganks</string>
+    <string name="label_active">Active Ganks</string>
+    <string name="label_completed">Completed Ganks</string>
     <string name="no_ganks_all">No Ganks Data!</string>
-    <string name="no_ganks_active">You have no active TO-DOs!</string>
-    <string name="no_ganks_completed">You have no completed TO-DOs!</string>
+    <string name="no_ganks_active">You have no active Ganks!</string>
+    <string name="no_ganks_completed">You have no completed Ganks!</string>
     <string name="click_to_reload">click to reload</string>
     <string name="refresh">Refresh</string>
 </resources>

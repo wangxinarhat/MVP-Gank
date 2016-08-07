@@ -20,10 +20,12 @@ import android.support.annotation.NonNull;
 
 import com.orhanobut.logger.Logger;
 import com.wangxinarhat.mvp.data.Gank;
+import com.wangxinarhat.mvp.data.Results;
 import com.wangxinarhat.mvp.data.source.GanksDataSource;
 import com.wangxinarhat.mvp.data.source.GanksRepository;
 import com.wangxinarhat.mvp.utils.EspressoIdlingResource;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +53,9 @@ public class GanksPresenter implements GanksContract.Presenter {
 
     private boolean mFirstLoad = true;
     private CompositeSubscription mSubscriptions;
+
+
+    List<Gank> mGankList = new ArrayList<>();
 
     public GanksPresenter(@NonNull GanksRepository ganksRepository, @NonNull GanksContract.View ganksView) {
         mGanksRepository = checkNotNull(ganksRepository, "ganksRepository cannot be null");
@@ -128,7 +133,10 @@ public class GanksPresenter implements GanksContract.Presenter {
                     }
                 });
         mSubscriptions.add(subscription);
-    }
+
+
+
+}
 
     private void processGanks(List<Gank> ganks) {
         if (ganks.isEmpty()) {
@@ -219,6 +227,20 @@ public class GanksPresenter implements GanksContract.Presenter {
     @Override
     public GanksFilterType getFiltering() {
         return mCurrentFiltering;
+    }
+
+
+    private List<Gank> addAllResults(Results results) {
+        mGankList.clear();
+        if (results.androidList != null) mGankList.addAll(results.androidList);
+        if (results.iOSList != null) mGankList.addAll(results.iOSList);
+        if (results.appList != null) mGankList.addAll(results.appList);
+        if (results.expandList != null) mGankList.addAll(results.expandList);
+        if (results.recommendList != null) mGankList.addAll(results.recommendList);
+        if (results.restList != null) mGankList.addAll(results.restList);
+        // make meizi data is in first position
+        if (results.welfareList != null) mGankList.addAll(0, results.welfareList);
+        return mGankList;
     }
 
 }

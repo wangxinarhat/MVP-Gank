@@ -81,7 +81,7 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
         super.onCreate(savedInstanceState);
         mAdapter = new GanksAdapter(new ArrayList<Gank>(0), mItemListener);
     }
-
+//presenter开始获取数据并调用view中方法改变界面显示，其调用时机是在Fragment类的onResume方法中
     @Override
     public void onResume() {
         super.onResume();
@@ -93,7 +93,7 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
         super.onPause();
         mPresenter.unsubscribe();
     }
-
+//将presenter实例传入view中，其调用时机是presenter实现类的构造函数中。
     @Override
     public void setPresenter(@NonNull GanksContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
