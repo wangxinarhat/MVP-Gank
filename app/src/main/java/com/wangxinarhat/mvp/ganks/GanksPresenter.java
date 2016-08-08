@@ -150,12 +150,13 @@ public class GanksPresenter implements GanksContract.Presenter {
     private void processGanks(List<Gank> ganks) {
         if (ganks.isEmpty()) {
             // Show a message indicating there are no ganks for that filter type.
-            if (3 > preDay) {
+                processEmptyGanks();
+           /* if (3 > preDay) {
                 loadGanks(false, new Date(mCurrentDate.getTime() -  DAY_OF_MILLISECOND), true);
                 preDay++;
             } else {
                 processEmptyGanks();
-            }
+            }*/
         } else {
             // Show the list of ganks
             mGanksView.showGanks(ganks);
