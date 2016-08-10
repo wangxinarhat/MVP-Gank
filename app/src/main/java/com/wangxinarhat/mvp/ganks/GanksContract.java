@@ -38,7 +38,7 @@ public interface GanksContract {
 
         void showReloadGank();
 
-        void showGankDetailsUi(String GankId);
+        void showGankDetailsUi(String url,String title);
 
         void showGankMarkedComplete();
 

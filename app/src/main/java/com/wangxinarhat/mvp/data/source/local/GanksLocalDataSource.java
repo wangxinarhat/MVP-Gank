@@ -89,7 +89,7 @@ public class GanksLocalDataSource implements GanksDataSource {
     }
 
     @Override
-    public Observable<Gank> getGank(@NonNull String gankId) {
+    public Observable<Gank> getGank(@NonNull String gankId,int position) {
         String[] projection = {
                 GankEntry.COLUMN_NAME_ENTRY_ID,
                 GankEntry.COLUMN_NAME_TITLE,

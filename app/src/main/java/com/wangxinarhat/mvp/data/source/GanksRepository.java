@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -102,8 +104,8 @@ public class GanksRepository implements GanksDataSource {
         }
 
         Observable<List<Gank>> remoteGanks = mGanksRemoteDataSource
-                .getGanks(date);
-                /*.flatMap(new Func1<List<Gank>, Observable<Gank>>() {//Observable.flatMap()接收一个Observable的输出作为输入，同时输出另外一个Observable
+                .getGanks(date)
+                .flatMap(new Func1<List<Gank>, Observable<Gank>>() {//Observable.flatMap()接收一个Observable的输出作为输入，同时输出另外一个Observable
                     @Override
                     public Observable<Gank> call(List<Gank> Ganks) {//接收一个集合作为输入，然后每次输出一个元素给subscriber
                         return Observable.from(Ganks);
@@ -124,7 +126,7 @@ public class GanksRepository implements GanksDataSource {
                     public void call() {
                         mCacheIsDirty = false;
                     }
-                });*/
+                });
         if (mCacheIsDirty) {
             return remoteGanks;
         } else {
@@ -218,7 +220,7 @@ public class GanksRepository implements GanksDataSource {
      * uses the network data source. This is done to simplify the sample.
      */
     @Override
-    public Observable<Gank> getGank(@NonNull final String GankId) {
+    public Observable<Gank> getGank(@NonNull final String GankId,int position) {
         checkNotNull(GankId);
 
         final Gank cachedGank = getGankWithId(GankId);
@@ -232,7 +234,7 @@ public class GanksRepository implements GanksDataSource {
 
         // Is the Gank in the local data source? If not, query the network.
         Observable<Gank> localGank = mGanksLocalDataSource
-                .getGank(GankId)
+                .getGank(GankId,position)
                 .doOnNext(new Action1<Gank>() {
                     @Override
                     public void call(Gank Gank) {
@@ -240,7 +242,7 @@ public class GanksRepository implements GanksDataSource {
                     }
                 });
         Observable<Gank> remoteGank = mGanksRemoteDataSource
-                .getGank(GankId)
+                .getGank(GankId,position)
                 .doOnNext(new Action1<Gank>() {
                     @Override
                     public void call(Gank Gank) {

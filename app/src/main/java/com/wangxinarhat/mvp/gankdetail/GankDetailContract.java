@@ -1,5 +1,7 @@
 package com.wangxinarhat.mvp.gankdetail;
 
+import android.webkit.WebView;
+
 import com.wangxinarhat.mvp.base.BasePresenter;
 import com.wangxinarhat.mvp.base.BaseView;
 
@@ -9,6 +11,8 @@ import com.wangxinarhat.mvp.base.BaseView;
 public interface GankDetailContract {
     interface View extends BaseView<Presenter> {
         void setLoadingIndicator(boolean active);
+
+        void showMissingGank();
 
         void showGankMarkedComplete();
 
@@ -22,5 +26,7 @@ public interface GankDetailContract {
         void activateGank();
 
         void completeGank();
+        void setUpWebView(WebView webView);
+        void loadUrl(WebView webView,String url);
     }
 }

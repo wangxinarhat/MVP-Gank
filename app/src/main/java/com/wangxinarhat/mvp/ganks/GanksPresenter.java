@@ -20,12 +20,10 @@ import android.support.annotation.NonNull;
 
 import com.orhanobut.logger.Logger;
 import com.wangxinarhat.mvp.data.Gank;
-import com.wangxinarhat.mvp.data.Results;
 import com.wangxinarhat.mvp.data.source.GanksDataSource;
 import com.wangxinarhat.mvp.data.source.GanksRepository;
 import com.wangxinarhat.mvp.utils.EspressoIdlingResource;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -55,8 +53,6 @@ public class GanksPresenter implements GanksContract.Presenter {
     private boolean mFirstLoad = true;
     private CompositeSubscription mSubscriptions;
 
-
-    List<Gank> mGankList = new ArrayList<>();
 
     public GanksPresenter(@NonNull GanksRepository ganksRepository, @NonNull GanksContract.View ganksView) {
         mGanksRepository = checkNotNull(ganksRepository, "ganksRepository cannot be null");
@@ -151,12 +147,12 @@ public class GanksPresenter implements GanksContract.Presenter {
         if (ganks.isEmpty()) {
             // Show a message indicating there are no ganks for that filter type.
                 processEmptyGanks();
-           /* if (3 > preDay) {
+            if (3 > preDay) {
                 loadGanks(false, new Date(mCurrentDate.getTime() -  DAY_OF_MILLISECOND), true);
                 preDay++;
             } else {
                 processEmptyGanks();
-            }*/
+            }
         } else {
             // Show the list of ganks
             mGanksView.showGanks(ganks);
@@ -201,7 +197,7 @@ public class GanksPresenter implements GanksContract.Presenter {
     @Override
     public void openGankDetails(@NonNull Gank requestedGank) {
         checkNotNull(requestedGank, "requestedGank cannot be null!");
-        mGanksView.showGankDetailsUi(requestedGank.getId());
+        mGanksView.showGankDetailsUi(requestedGank.getUrl(),requestedGank.getTitle());
     }
 
     @Override
@@ -243,19 +239,4 @@ public class GanksPresenter implements GanksContract.Presenter {
     public GanksFilterType getFiltering() {
         return mCurrentFiltering;
     }
-
-
-    private List<Gank> addAllResults(Results results) {
-        mGankList.clear();
-        if (results.androidList != null) mGankList.addAll(results.androidList);
-        if (results.iOSList != null) mGankList.addAll(results.iOSList);
-        if (results.appList != null) mGankList.addAll(results.appList);
-        if (results.expandList != null) mGankList.addAll(results.expandList);
-        if (results.recommendList != null) mGankList.addAll(results.recommendList);
-        if (results.restList != null) mGankList.addAll(results.restList);
-        // make meizi data is in first position
-        if (results.welfareList != null) mGankList.addAll(0, results.welfareList);
-        return mGankList;
-    }
-
 }

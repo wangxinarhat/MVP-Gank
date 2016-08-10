@@ -33,7 +33,7 @@ public interface GanksDataSource {
 
     Observable<List<Gank>> getGanks(Date date);
 
-    Observable<Gank> getGank(@NonNull String GankId);
+    Observable<Gank> getGank(@NonNull String GankId,int position);
 
     void saveGank(@NonNull Gank Gank);
 

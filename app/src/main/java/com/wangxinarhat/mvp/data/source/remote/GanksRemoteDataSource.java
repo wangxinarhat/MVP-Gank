@@ -28,11 +28,7 @@ import com.wangxinarhat.mvp.data.source.GanksDataSource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -47,15 +43,10 @@ public class GanksRemoteDataSource implements GanksDataSource {
 
     private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
 
-    private final static Map<String, Gank> TASKS_SERVICE_DATA;
 
     private Date mCurrentDate;
+    private List<Gank> mGankList;
 
-    static {
-        TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
-        addGank("Build tower in Pisa", "Ground looks good, no foundation work required.");
-        addGank("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
-    }
 
     private GanksRemoteDataSource(Date date) {
         mCurrentDate = date;
@@ -72,12 +63,6 @@ public class GanksRemoteDataSource implements GanksDataSource {
     private GanksRemoteDataSource() {
     }
 
-    private static void addGank(String title, String description) {
-        Gank newGank = new Gank();
-        TASKS_SERVICE_DATA.put(newGank.getId(), newGank);
-    }
-
-
     public static final GankService mGankService = GankFactory.getGankService();
 
     @Override
@@ -92,7 +77,7 @@ public class GanksRemoteDataSource implements GanksDataSource {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
 
-        Observable<List<Gank>> observable = mGankService.getGankData(2016, 8, 5)
+        Observable<List<Gank>> observable = mGankService.getGankData(year, month, day)
                 .map(new Func1<GankData, Results>() {
                     @Override
                     public Results call(GankData gankData) {
@@ -110,24 +95,28 @@ public class GanksRemoteDataSource implements GanksDataSource {
     }
 
     private List<Gank> addAllResults(Results results) {
-        List<Gank> gankList = new ArrayList<>();
-        if (results.androidList != null) gankList.addAll(results.androidList);
-        if (results.iOSList != null) gankList.addAll(results.iOSList);
-        if (results.appList != null) gankList.addAll(results.appList);
-        if (results.expandList != null) gankList.addAll(results.expandList);
-        if (results.recommendList != null) gankList.addAll(results.recommendList);
-        if (results.restList != null) gankList.addAll(results.restList);
+        if (null == mGankList) {
+            mGankList = new ArrayList<>();
+        } else {
+            mGankList.clear();
+        }
+        if (results.androidList != null) mGankList.addAll(results.androidList);
+        if (results.iOSList != null) mGankList.addAll(results.iOSList);
+        if (results.appList != null) mGankList.addAll(results.appList);
+        if (results.expandList != null) mGankList.addAll(results.expandList);
+        if (results.recommendList != null) mGankList.addAll(results.recommendList);
+        if (results.restList != null) mGankList.addAll(results.restList);
         // make meizi data is in first gankList
-        if (results.welfareList != null) gankList.addAll(0, results.welfareList);
-        return gankList;
+        if (results.welfareList != null) mGankList.addAll(0, results.welfareList);
+        return mGankList;
     }
 
 
     @Override
-    public Observable<Gank> getGank(@NonNull String gankId) {
-        final Gank gank = TASKS_SERVICE_DATA.get(gankId);
+    public Observable<Gank> getGank(String gankId,int position) {
+        final Gank gank = mGankList.get(position);
         if (gank != null) {
-            return Observable.just(gank).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
+            return Observable.just(gank);
         } else {
             return Observable.empty();
         }
@@ -135,13 +124,10 @@ public class GanksRemoteDataSource implements GanksDataSource {
 
     @Override
     public void saveGank(Gank gank) {
-        TASKS_SERVICE_DATA.put(gank.getId(), gank);
     }
 
     @Override
     public void completeGank(Gank gank) {
-        Gank completedGank = new Gank(gank.getTitle(), gank.getDescription(), gank.getId(), true);
-        TASKS_SERVICE_DATA.put(gank.getId(), completedGank);
     }
 
     @Override
@@ -152,8 +138,6 @@ public class GanksRemoteDataSource implements GanksDataSource {
 
     @Override
     public void activateGank(Gank gank) {
-        Gank activeGank = new Gank(gank.getTitle(), gank.getDescription(), gank.getId());
-        TASKS_SERVICE_DATA.put(gank.getId(), activeGank);
     }
 
     @Override
@@ -164,13 +148,7 @@ public class GanksRemoteDataSource implements GanksDataSource {
 
     @Override
     public void clearCompletedGanks() {
-        Iterator<Map.Entry<String, Gank>> it = TASKS_SERVICE_DATA.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Gank> entry = it.next();
-            if (entry.getValue().isCompleted()) {
-                it.remove();
-            }
-        }
+
     }
 
     @Override
@@ -181,11 +159,9 @@ public class GanksRemoteDataSource implements GanksDataSource {
 
     @Override
     public void deleteAllGanks() {
-        TASKS_SERVICE_DATA.clear();
     }
 
     @Override
     public void deleteGank(String gankId) {
-        TASKS_SERVICE_DATA.remove(gankId);
     }
 }

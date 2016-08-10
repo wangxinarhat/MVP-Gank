@@ -40,10 +40,15 @@ import android.widget.TextView;
 
 import com.wangxinarhat.mvp.R;
 import com.wangxinarhat.mvp.data.Gank;
+import com.wangxinarhat.mvp.gankdetail.GankDetailActivity;
+import com.wangxinarhat.mvp.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -52,21 +57,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class GanksFragment extends Fragment implements GanksContract.View, OnRecyclerViewItemClickListener {
 
+    @BindView(R.id.filteringLabel)
+    TextView mFilteringLabel;
+    @BindView(R.id.recycler)
+    RecyclerView mRecycler;
+    @BindView(R.id.ganks_container)
+    LinearLayout mGanksContainer;
+    @BindView(R.id.no_ganks_icon)
+    ImageView mNoGanksIcon;
+    @BindView(R.id.no_ganks_main)
+    TextView mNoGanksMain;
+    @BindView(R.id.no_ganks_add)
+    TextView mNoGanksAdd;
+    @BindView(R.id.no_ganks)
+    LinearLayout mNoGanks;
+    @BindView(R.id.swipe)
+    ScrollChildSwipeRefreshLayout mSwipe;
+
+
     private GanksContract.Presenter mPresenter;
 
     private GanksAdapter mAdapter;
-
-    private View mNoGanksView;
-
-    private ImageView mNoGankIcon;
-
-    private TextView mNoGankMainView;
-
-    private TextView mNoGankAddView;
-
-    private LinearLayout mGanksView;
-
-    private TextView mFilteringLabelView;
 
     public GanksFragment() {
         // Requires empty public constructor
@@ -81,7 +92,8 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
         super.onCreate(savedInstanceState);
         mAdapter = new GanksAdapter(new ArrayList<Gank>(0), mItemListener);
     }
-//presenter开始获取数据并调用view中方法改变界面显示，其调用时机是在Fragment类的onResume方法中
+
+    //presenter开始获取数据并调用view中方法改变界面显示，其调用时机是在Fragment类的onResume方法中
     @Override
     public void onResume() {
         super.onResume();
@@ -93,7 +105,8 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
         super.onPause();
         mPresenter.unsubscribe();
     }
-//将presenter实例传入view中，其调用时机是presenter实现类的构造函数中。
+
+    //将presenter实例传入view中，其调用时机是presenter实现类的构造函数中。
     @Override
     public void setPresenter(@NonNull GanksContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
@@ -110,22 +123,15 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.ganks_frag, container, false);
 
+        ButterKnife.bind(this, root);
         // Set up ganks view
-        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.ganks_list);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(mAdapter);
+        mRecycler.setLayoutManager(layoutManager);
+        mRecycler.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(this);
-        mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
-        mGanksView = (LinearLayout) root.findViewById(R.id.ganksLL);
-
 
         // Set up  no ganks view
-        mNoGanksView = root.findViewById(R.id.noGanks);
-        mNoGankIcon = (ImageView) root.findViewById(R.id.noGanksIcon);
-        mNoGankMainView = (TextView) root.findViewById(R.id.noGanksMain);
-        mNoGankAddView = (TextView) root.findViewById(R.id.noGanksAdd);
-        mNoGankAddView.setOnClickListener(new View.OnClickListener() {
+        mNoGanksAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showReloadGank();
@@ -144,17 +150,15 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
         });
 
         // Set up progress indicator
-        final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
-                (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
-        swipeRefreshLayout.setColorSchemeColors(
+        mSwipe.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(recyclerView);
+        mSwipe.setScrollUpChild(mRecycler);
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
 //                mPresenter.loadGanks(false);
@@ -242,14 +246,11 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
         if (getView() == null) {
             return;
         }
-        final SwipeRefreshLayout srl =
-                (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
-
         // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post(new Runnable() {
+        mSwipe.post(new Runnable() {
             @Override
             public void run() {
-                srl.setRefreshing(active);
+                mSwipe.setRefreshing(active);
             }
         });
     }
@@ -258,8 +259,8 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
     public void showGanks(List<Gank> ganks) {
         mAdapter.replaceData(ganks);
 
-        mGanksView.setVisibility(View.VISIBLE);
-        mNoGanksView.setVisibility(View.GONE);
+        mGanksContainer.setVisibility(View.VISIBLE);
+        mNoGanks.setVisibility(View.GONE);
     }
 
     @Override
@@ -295,27 +296,27 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
     }
 
     private void showNoGanksViews(String mainText, int iconRes, boolean showAddView) {
-        mGanksView.setVisibility(View.GONE);
-        mNoGanksView.setVisibility(View.VISIBLE);
+        mGanksContainer.setVisibility(View.GONE);
+        mNoGanks.setVisibility(View.VISIBLE);
 
-        mNoGankMainView.setText(mainText);
-        mNoGankIcon.setImageDrawable(getResources().getDrawable(iconRes));
-        mNoGankAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+        mNoGanksMain.setText(mainText);
+        mNoGanksIcon.setImageDrawable(getResources().getDrawable(iconRes));
+        mNoGanksAdd.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void showActiveFilterLabel() {
-        mFilteringLabelView.setText(getResources().getString(R.string.label_active));
+        mFilteringLabel.setText(getResources().getString(R.string.label_active));
     }
 
     @Override
     public void showCompletedFilterLabel() {
-        mFilteringLabelView.setText(getResources().getString(R.string.label_completed));
+        mFilteringLabel.setText(getResources().getString(R.string.label_completed));
     }
 
     @Override
     public void showAllFilterLabel() {
-        mFilteringLabelView.setText(getResources().getString(R.string.label_all));
+        mFilteringLabel.setText(getResources().getString(R.string.label_all));
     }
 
     @Override
@@ -327,13 +328,10 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
     }
 
     @Override
-    public void showGankDetailsUi(String gankId) {
-        // in it's own Activity, since it makes more sense that way and it gives us the flexibility
-        // to show some Intent stubbing.
-//        Intent intent = new Intent(getContext(), GankDetailActivity.class);
-//        intent.putExtra(GankDetailActivity.EXTRA_TASK_ID, gankId);
-//        startActivity(intent);
+    public void showGankDetailsUi(String url, String title) {
+        getContext().startActivity(GankDetailActivity.getIntent(url, title));
     }
+
 
     @Override
     public void showGankMarkedComplete() {
@@ -357,7 +355,7 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
 
 
     private void showMessage(String message) {
-        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        CommonUtils.showShortSnackbar(getView(), message);
     }
 
     @Override
@@ -368,6 +366,6 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
 
     @Override
     public void onItemClick(View itemView, int position, int itemViewType, Gank gank, View viewImage, View viewText) {
-
+        showGankDetailsUi(gank.getUrl(), gank.getTitle());
     }
 }
