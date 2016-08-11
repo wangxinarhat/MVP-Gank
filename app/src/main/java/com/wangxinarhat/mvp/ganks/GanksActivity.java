@@ -40,6 +40,8 @@ public class GanksActivity extends AppCompatActivity
     DrawerLayout mDrawerLayout;
 
 
+
+
     private GanksPresenter mGanksPresenter;
 
     @Override

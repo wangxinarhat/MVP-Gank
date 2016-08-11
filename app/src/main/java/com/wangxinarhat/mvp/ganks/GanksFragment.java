@@ -328,8 +328,13 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
     }
 
     @Override
-    public void showGankDetailsUi(String url, String title) {
-        getContext().startActivity(GankDetailActivity.getIntent(url, title));
+    public void showGankDetailsUi(int itemViewType, String url, String title) {
+        if (itemViewType == ItemType.ITEM_TYPE_GIRL.ordinal()) {
+
+        } else if (itemViewType == ItemType.ITEM_TYPE_NORMAL.ordinal()) {
+            getContext().startActivity(GankDetailActivity.getIntent(url, title));
+        } else if (itemViewType == ItemType.ITEM_TYPE_CATEGOTY.ordinal()) {
+        }
     }
 
 
@@ -366,6 +371,6 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
 
     @Override
     public void onItemClick(View itemView, int position, int itemViewType, Gank gank, View viewImage, View viewText) {
-        showGankDetailsUi(gank.getUrl(), gank.getTitle());
+        showGankDetailsUi(itemViewType, gank.getUrl(), gank.getTitle());
     }
 }
