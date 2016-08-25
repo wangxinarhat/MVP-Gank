@@ -40,8 +40,6 @@ public class GanksActivity extends AppCompatActivity
     DrawerLayout mDrawerLayout;
 
 
-
-
     private GanksPresenter mGanksPresenter;
 
     @Override
@@ -55,10 +53,13 @@ public class GanksActivity extends AppCompatActivity
     }
 
     private void initView(Bundle savedInstanceState) {
+
+        // Set up The Toolbar
         setSupportActionBar(mToolbar);
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
+
 
         // Set up the navigation drawer.
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -73,16 +74,12 @@ public class GanksActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-//Set up the FloatingActionButton
-
-
-        GanksFragment ganksFragment =
-                (GanksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        // find fragment
+        GanksFragment ganksFragment = (GanksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
         if (ganksFragment == null) {
             // Create the fragment
             ganksFragment = GanksFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), ganksFragment, R.id.contentFrame);
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), ganksFragment, R.id.contentFrame);
         }
 
 //        创建后的fragment实例作为presenter的构造函数参数被传入，这样就可以在presenter中调用view中的方法了
@@ -90,7 +87,10 @@ public class GanksActivity extends AppCompatActivity
         // Create the presenter
 //        mGanksPresenter = new GanksPresenter(
 //                Injection.provideGanksRepository(getApplicationContext()), ganksFragment);
-        mGanksPresenter = new GanksPresenter(GanksRepository.getInstance(GanksRemoteDataSource.getInstance(new Date(System.currentTimeMillis())), GanksLocalDataSource.getInstance(this)), ganksFragment);
+        mGanksPresenter = new GanksPresenter(
+                GanksRepository.getInstance(
+                        GanksRemoteDataSource.getInstance(
+                                new Date(System.currentTimeMillis())), GanksLocalDataSource.getInstance(this)), ganksFragment);
         // Load previously saved state, if available.
         if (savedInstanceState != null) {
             GanksFilterType currentFiltering =
