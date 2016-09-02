@@ -21,6 +21,9 @@ public class HolderCategory extends BaseHolder {
         ButterKnife.bind(this, itemView);
     }
 
+
+
+
     @Override
     public void bindData(Gank gank) {
 

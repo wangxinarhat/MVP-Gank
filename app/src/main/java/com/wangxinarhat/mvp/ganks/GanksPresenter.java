@@ -197,7 +197,7 @@ public class GanksPresenter implements GanksContract.Presenter {
     @Override
     public void openGankDetails(@NonNull Gank requestedGank) {
         checkNotNull(requestedGank, "requestedGank cannot be null!");
-        mGanksView.showGankDetailsUi(itemViewType, requestedGank.getUrl(),requestedGank.getTitle());
+//        mGanksView.showGankDetailsUi(itemViewType, requestedGank.getUrl(),requestedGank.getTitle());
     }
 
     @Override
