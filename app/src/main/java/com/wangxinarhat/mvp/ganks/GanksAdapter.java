@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 
 import com.wangxinarhat.mvp.R;
 import com.wangxinarhat.mvp.base.BaseHolder;
+import com.wangxinarhat.mvp.base.OnHolderClickListener;
+import com.wangxinarhat.mvp.base.OnItemClickListener;
 import com.wangxinarhat.mvp.data.Gank;
 import com.wangxinarhat.mvp.global.GankCategory;
 
@@ -25,7 +27,7 @@ public class GanksAdapter extends RecyclerView.Adapter<BaseHolder> implements On
     /**
      * The listener that receives notifications when an item is clicked.
      */
-    OnRecyclerViewItemClickListener mOnItemClickListener;
+    OnItemClickListener mOnItemClickListener;
     private List<Gank> mGanks;
     private GanksItemListener mItemListener;
 
@@ -67,7 +69,13 @@ public class GanksAdapter extends RecyclerView.Adapter<BaseHolder> implements On
 
     @Override
     public void onBindViewHolder(BaseHolder holder, int position) {
-        holder.bindData(mGanks.get(position));
+        if (holder instanceof HolderGirl) {
+            ((HolderGirl) holder).bindData(mGanks.get(position));
+        } else if (holder instanceof HolderCategory) {
+            ((HolderCategory) holder).bindData(mGanks.get(position));
+        } else if (holder instanceof HolderNormal) {
+            ((HolderNormal) holder).bindData(mGanks.get(position));
+        }
     }
 
     @Override
@@ -146,14 +154,20 @@ public class GanksAdapter extends RecyclerView.Adapter<BaseHolder> implements On
     }
 
 
-    public void setOnItemClickListener(@Nullable OnRecyclerViewItemClickListener listener) {
+    public void setOnItemClickListener(@Nullable OnItemClickListener listener) {
         mOnItemClickListener = listener;
     }
 
 
-
     @Override
-    public void onHolderClick(View itemView, int position, int itemViewType, Gank gank, View viewImage, View viewText) {
-        mOnItemClickListener.onItemClick(itemView, position, itemViewType, gank, viewImage, viewText);
+    public void onHolderClick(View itemView, int position) {
+        if (null != mOnItemClickListener) {
+
+            mOnItemClickListener.onItemClick(itemView, position);
+        }
+    }
+
+    public List<Gank> getmGanks() {
+        return mGanks;
     }
 }

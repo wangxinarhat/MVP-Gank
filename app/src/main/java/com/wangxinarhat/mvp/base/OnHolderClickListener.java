@@ -1,4 +1,4 @@
-package com.wangxinarhat.mvp.ganks;
+package com.wangxinarhat.mvp.base;
 
 import android.view.View;
 
@@ -11,7 +11,7 @@ import com.wangxinarhat.mvp.data.Gank;
 public interface OnHolderClickListener {
 
 
-    void onHolderClick(View itemView, int position, int itemViewType, Gank gank, View viewImage, View viewText);
+    void onHolderClick(View itemView, int position);
 
 
 }

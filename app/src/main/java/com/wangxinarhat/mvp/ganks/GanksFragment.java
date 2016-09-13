@@ -39,6 +39,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.wangxinarhat.mvp.R;
+import com.wangxinarhat.mvp.base.OnItemClickListener;
 import com.wangxinarhat.mvp.data.Gank;
 import com.wangxinarhat.mvp.gankdetail.GankDetailActivity;
 import com.wangxinarhat.mvp.utils.CommonUtils;
@@ -55,7 +56,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Display a grid of {@link Gank}s. User can choose to view all, active or completed ganks.
  */
-public class GanksFragment extends Fragment implements GanksContract.View, OnRecyclerViewItemClickListener {
+public class GanksFragment extends Fragment implements GanksContract.View, OnItemClickListener {
 
     @BindView(R.id.filteringLabel)
     TextView mFilteringLabel;
@@ -370,7 +371,10 @@ public class GanksFragment extends Fragment implements GanksContract.View, OnRec
 
 
     @Override
-    public void onItemClick(View itemView, int position, int itemViewType, Gank gank, View viewImage, View viewText) {
-        showGankDetailsUi(itemViewType, gank.getUrl(), gank.getTitle());
+    public void onItemClick(View itemView, int position) {
+
+        Gank gank = mAdapter.getmGanks().get(position);
+
+        showGankDetailsUi(mAdapter.getItemViewType(position), gank.getUrl(), gank.getTitle());
     }
 }
